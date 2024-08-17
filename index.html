@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #000;
+        }
+        #gameCanvas {
+            border: 2px solid #fff;
+        }
+        .ghost, .pacman, .dot {
+            position: absolute;
+            background: #ff0;
+            border-radius: 50%;
+        }
+        .ghost {
+            background: #f00;
+        }
+        .dot {
+            background: #fff;
+            width: 10px;
+            height: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameCanvas"></div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        canvas.style.width = '400px';
+        canvas.style.height = '400px';
+        canvas.style.position = 'relative';
+
+        const gameWidth = canvas.clientWidth;
+        const gameHeight = canvas.clientHeight;
+
+        const pacman = document.createElement('div');
+        pacman.className = 'pacman';
+        pacman.style.width = '40px';
+        pacman.style.height = '40px';
+        pacman.style.top = '180px';
+        pacman.style.left = '180px';
+        canvas.appendChild(pacman);
+
+        const ghost = document.createElement('div');
+        ghost.className = 'ghost';
+        ghost.style.width = '40px';
+        ghost.style.height = '40px';
+        ghost.style.top = '80px';
+        ghost.style.left = '80px';
+        canvas.appendChild(ghost);
+
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.style.width = '10px';
+        dot.style.height = '10px';
+        dot.style.top = '200px';
+        dot.style.left = '200px';
+        canvas.appendChild(dot);
+
+        let pacmanPos = { x: 180, y: 180 };
+        let ghostPos = { x: 80, y: 80 };
+
+        function updatePosition(element, pos) {
+            element.style.left = pos.x + 'px';
+            element.style.top = pos.y + 'px';
+        }
+
+        function movePacman(e) {
+            switch (e.key) {
+                case 'ArrowUp':
+                    pacmanPos.y -= 10;
+                    break;
+                case 'ArrowDown':
+                    pacmanPos.y += 10;
+                    break;
+                case 'ArrowLeft':
+                    pacmanPos.x -= 10;
+                    break;
+                case 'ArrowRight':
+                    pacmanPos.x += 10;
+                    break;
+            }
+
+            if (pacmanPos.x < 0) pacmanPos.x = 0;
+            if (pacmanPos.y < 0) pacmanPos.y = 0;
+            if (pacmanPos.x > gameWidth - 40) pacmanPos.x = gameWidth - 40;
+            if (pacmanPos.y > gameHeight - 40) pacmanPos.y = gameHeight - 40;
+
+            updatePosition(pacman, pacmanPos);
+            checkCollision();
+        }
+
+        function moveGhost() {
+            ghostPos.x += (Math.random() - 0.5) * 20;
+            ghostPos.y += (Math.random() - 0.5) * 20;
+
+            if (ghostPos.x < 0) ghostPos.x = 0;
+            if (ghostPos.y < 0) ghostPos.y = 0;
+            if (ghostPos.x > gameWidth - 40) ghostPos.x = gameWidth - 40;
+            if (ghostPos.y > gameHeight - 40) ghostPos.y = gameHeight - 40;
+
+            updatePosition(ghost, ghostPos);
+            checkCollision();
+        }
+
+        function checkCollision() {
+            if (Math.abs(pacmanPos.x - ghostPos.x) < 40 && Math.abs(pacmanPos.y - ghostPos.y) < 40) {
+                alert('Game Over! You were caught by the ghost.');
+                pacmanPos = { x: 180, y: 180 };
+                ghostPos = { x: 80, y: 80 };
+                updatePosition(pacman, pacmanPos);
+                updatePosition(ghost, ghostPos);
+            }
+
+            if (Math.abs(pacmanPos.x - parseInt(dot.style.left)) < 40 && Math.abs(pacmanPos.y - parseInt(dot.style.top)) < 40) {
+                alert('You ate the dot!');
+                dot.style.top = Math.random() * (gameHeight - 10) + 'px';
+                dot.style.left = Math.random() * (gameWidth - 10) + 'px';
+            }
+        }
+
+        window.addEventListener('keydown', movePacman);
+        setInterval(moveGhost, 500);
+    </script>
+</body>
+</html>
